@@ -61,8 +61,10 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SUBO_OTP_BASE_URL: http://otp:8080
 
-      # Write the GTFS feed straight into OTP's data directory.
-      SUBO_GTFS_EXPORT_WORKING_DIRECTORY: /var/opentripplanner/work
+      # Only the finished zip lands in OTP's data directory. The loose .txt
+      # scratch files stay on the container filesystem so they never end up in
+      # the bind mount (and therefore never in git).
+      SUBO_GTFS_EXPORT_WORKING_DIRECTORY: /tmp/gtfs-work
       SUBO_GTFS_EXPORT_ZIP_PATH: /var/opentripplanner/subo-gtfs.zip
 
       # spring-boot-docker-compose is developmentOnly (absent from the bootJar);

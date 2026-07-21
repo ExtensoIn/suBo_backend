@@ -40,3 +40,4 @@ out/
 /infrastructure/otp/data/*.zip
 /infrastructure/otp/data/*.pbf
 /infrastructure/otp/test-gtfs
+/infrastructure/otp/data/work/
