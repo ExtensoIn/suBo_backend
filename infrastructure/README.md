@@ -118,6 +118,40 @@ For `expo start --web` you will additionally need CORS on the backend
 (`allowed-origins` for `http://localhost:8081`). Native builds do not need it,
 and no CORS configuration exists in the app today.
 
+## Windows / macOS notes
+
+The stack is portable, with four caveats.
+
+**1. `bootstrap.sh` needs a bash shell.** On Windows run it from **Git Bash** or
+**WSL2**, not PowerShell. If you prefer PowerShell, run the four steps from
+"Why bootstrap.sh exists" by hand — they are all plain `docker compose` calls.
+
+**2. Give Docker Desktop enough memory.** Every OTP step requests a 4 GB heap
+(`OTP_MAX_HEAP`), and on Windows/macOS containers are capped by the Docker
+Desktop VM, not by host RAM. Allocate **at least 6 GB** in Docker Desktop →
+Settings → Resources, otherwise `--buildStreet` dies with an opaque exit 137
+(OOM-kill). Lowering `OTP_MAX_HEAP` below ~3 GB will not build this graph.
+
+**3. Apple Silicon: switch the Postgres image.** `postgis/postgis` ships
+`linux/amd64` only and runs under emulation on M-series Macs. Put a multi-arch
+build in `.env`:
+
+```
+POSTGIS_IMAGE=imresamu/postgis:18-3.6
+```
+
+(`ghcr.io/baosystems/postgis:18-3.6` also works. Both provide amd64 + arm64.)
+The OTP, Gradle and Temurin images are already multi-arch.
+
+**4. `APP_UID`/`APP_GID` are a Linux concern.** Docker Desktop's file sharing
+maps ownership for you, so the default `1000:1000` is harmless on Windows and
+macOS even though the Mac's own uid is usually 501. Only change it on Linux, if
+`id -u` is not 1000.
+
+Line endings are pinned in `.gitattributes` (`*.sh`, `Dockerfile`, `*.yaml`
+forced to LF), so a Windows checkout will not produce scripts the container
+cannot parse.
+
 ## Health checks
 
 ```bash

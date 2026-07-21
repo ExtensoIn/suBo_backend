@@ -95,6 +95,17 @@ OTP_PORT="${OTP_PORT:-8082}"
 printf '\nStack is up:\n'
 printf '  app   http://localhost:%s   (health: /actuator/health)\n' "$APP_PORT"
 printf '  otp   http://localhost:%s   (health: /otp)\n' "$OTP_PORT"
-LAN_IP="$(hostname -I | awk '{print $1}')"
+# hostname -I is Linux-only; macOS needs ipconfig. Never fail the script over
+# a cosmetic hint.
+lan_ip() {
+  if command -v hostname >/dev/null 2>&1 && hostname -I >/dev/null 2>&1; then
+    hostname -I | awk '{print $1}'
+  elif command -v ipconfig >/dev/null 2>&1; then
+    ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null
+  else
+    echo "<your-lan-ip>"
+  fi
+}
+
 printf '\nFor the Expo app on a phone, point it at:\n'
-printf '  EXPO_PUBLIC_API_URL=http://%s:%s\n\n' "$LAN_IP" "$APP_PORT"
+printf '  EXPO_PUBLIC_API_URL=http://%s:%s\n\n' "$(lan_ip)" "$APP_PORT"

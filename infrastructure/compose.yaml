@@ -12,7 +12,10 @@ x-otp-common: &otp-common
 
 services:
   postgis:
-    image: postgis/postgis:18-3.6
+    # postgis/postgis publishes amd64 only. On Apple Silicon it runs under
+    # emulation (slow, occasionally flaky), so set POSTGIS_IMAGE to a
+    # multi-arch build in .env — see infrastructure/README.md.
+    image: ${POSTGIS_IMAGE:-postgis/postgis:18-3.6}
     container_name: subo-postgis
     restart: unless-stopped
 
