@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: subo
+  docker:
+    compose:
+      enabled: true
+      file: infrastructure/compose.yaml
+      lifecycle-management: start-only
+
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:55432/subo
+    username: root
+    password: pass123
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+
+subo:
+  otp:
+    base-url: http://localhost:8081
+  gtfs:
+    agency-id: SUBO
+    agency-name: Subo
+    agency-url: https://example.com
+    agency-timezone: America/La_Paz
+    virtual-stop-spacing-meters: 75
+    service-horizon-days: 90
+    temporal-default:
+      minibus-travel-minutes: 45
+      trufi-travel-minutes: 45
+      pumakatari-travel-minutes: 45
+    export:
+      working-directory: build/generated-gtfs
+      zip-path: infrastructure/otp/data/subo-gtfs.zip

@@ -1,0 +1,2 @@
+schema: http://localhost:8081/otp/gtfs/v1
+documents: 'src/main/resources/graphql-documents/**/*.graphql'

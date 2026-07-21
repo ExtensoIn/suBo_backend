@@ -1,0 +1,58 @@
+query PlanConnection(
+    $origin: PlanLabeledLocationInput!
+    $destination: PlanLabeledLocationInput!
+    $dateTime: PlanDateTimeInput
+    $modes: PlanModesInput
+    $preferences: PlanPreferencesInput
+    $first: Int
+) {
+    planConnection(
+        origin: $origin
+        destination: $destination
+        dateTime: $dateTime
+        modes: $modes
+        preferences: $preferences
+        first: $first
+    ) {
+        routingErrors {
+            code
+            description
+        }
+
+        edges {
+            node {
+                start
+                end
+
+                legs {
+                    mode
+                    duration
+                    distance
+
+                    from {
+                        name
+                        lat
+                        lon
+                    }
+
+                    to {
+                        name
+                        lat
+                        lon
+                    }
+
+                    route {
+                        gtfsId
+                        shortName
+                        longName
+                        mode
+                    }
+
+                    legGeometry {
+                        points
+                    }
+                }
+            }
+        }
+    }
+}
