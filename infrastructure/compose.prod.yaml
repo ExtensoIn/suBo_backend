@@ -56,6 +56,11 @@ services:
     environment:
       # Inert until a reverse proxy is put in front; harmless meanwhile.
       SERVER_FORWARD_HEADERS_STRATEGY: framework
+
+      # Baked into every share link returned by POST /viajes. The
+      # application.yaml default is http://localhost:8080/t, which is
+      # unusable off the developer's machine.
+      SUBO_TRIP_SHARE_BASE_URL: ${TRIP_SHARE_BASE_URL:-http://localhost:8080/t}
     logging:
       driver: json-file
       options:
