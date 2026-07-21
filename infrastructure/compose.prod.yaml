@@ -1,0 +1,87 @@
+# Production overlay. Always used together with compose.yaml:
+#
+#   docker compose --env-file .env -f compose.yaml -f compose.prod.yaml up -d
+#
+# COMPATIBILITY: this file is strictly ADDITIVE — it only adds keys, never
+# removes or replaces list entries. Docker Compose merges list fields such as
+# `ports` by appending, and the `!override` / `!reset` tags that would let us
+# replace them require Compose >= 2.24. servidor-breick runs 2.19.1, so port
+# exposure is controlled through .env variables instead (see DEPLOY-breick.md):
+#
+#   APP_PORT=8090                  -> published publicly
+#   OTP_PORT=127.0.0.1:18082       -> loopback only
+#   postgis is already 127.0.0.1-only in compose.yaml
+#
+# Deliberately no mem_limit: capping was considered and declined. Note the OTP
+# JVM heap (OTP_MAX_HEAP) is a separate mechanism and IS set — without it the
+# JVM targets 4 GB, which does not fit alongside the other workloads.
+
+services:
+  # Public edge. The app is NOT published publicly in production (.env binds
+  # APP_PORT to loopback); this proxy is the only ingress, and it 403s
+  # /internal/* so the unauthenticated GTFS export endpoint is not reachable
+  # from the internet. See proxy/Caddyfile.
+  proxy:
+    image: caddy:2-alpine
+    container_name: subo-proxy
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "${PROXY_PORT:-8090}:8090"
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8090/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgis:
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  app:
+    restart: always
+    environment:
+      # Inert until a reverse proxy is put in front; harmless meanwhile.
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  otp:
+    restart: always
+    healthcheck:
+      # Explicit `bash`, NOT CMD-SHELL: /bin/sh in this image is dash, which has
+      # no /dev/tcp, so a CMD-SHELL variant fails with "Directory nonexistent"
+      # and reports a perfectly healthy OTP as unhealthy forever.
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /otp HTTP/1.0\\r\\n\\r\\n' >&3 && head -1 <&3 | grep -q '200 OK'"
+        ]
+      interval: 30s
+      timeout: 10s
+      # The graph is deserialized before the server listens; give it room.
+      start_period: 300s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
