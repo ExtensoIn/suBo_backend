@@ -1354,8 +1354,8 @@ SELECT
     gen_random_uuid(),
     p.route_pattern_id,
     d.day_of_week,
-    TIME '06:30:00',
-    TIME '22:30:00',
+    TIME '01:00:00',
+    TIME '3:59:00',
     40,
     'frequency_based',
     TRUE
@@ -1399,8 +1399,8 @@ SELECT
     gen_random_uuid(),
     p.route_pattern_id,
     7,
-    TIME '07:00:00',
-    TIME '21:00:00',
+    TIME '01:00:00',
+    TIME '3:59:00',
     40,
     'frequency_based',
     TRUE
