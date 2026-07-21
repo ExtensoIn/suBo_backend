@@ -1,3 +1,15 @@
+name: subo
+
+# Shared anchors ------------------------------------------------------------
+# Every OTP invocation (serve + the two graph-build passes) uses the same image
+# and the same data directory; only the command differs.
+x-otp-common: &otp-common
+  image: docker.io/opentripplanner/opentripplanner:2.9.0
+  environment:
+    JAVA_TOOL_OPTIONS: "-Xmx${OTP_MAX_HEAP:-4g}"
+  volumes:
+    - ./otp/data:/var/opentripplanner
+
 services:
   postgis:
     image: postgis/postgis:18-3.6
@@ -25,19 +37,83 @@ services:
       timeout: 5s
       retries: 10
 
-  otp:
-    image: docker.io/opentripplanner/opentripplanner:2.9.0
-    container_name: subo-otp
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: subo-app:local
+    container_name: subo-app
     restart: unless-stopped
 
+    # Runs as the host user so the GTFS export can write into the
+    # bind-mounted ./otp/data directory. Override in .env if your uid != 1000.
+    user: "${APP_UID:-1000}:${APP_GID:-1000}"
+
+    depends_on:
+      postgis:
+        condition: service_healthy
+
     environment:
-      JAVA_TOOL_OPTIONS: "-Xmx4g"
+      # Service names on the compose network replace the host-side
+      # localhost/55432 values baked into application.yaml.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgis:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SUBO_OTP_BASE_URL: http://otp:8080
+
+      # Write the GTFS feed straight into OTP's data directory.
+      SUBO_GTFS_EXPORT_WORKING_DIRECTORY: /var/opentripplanner/work
+      SUBO_GTFS_EXPORT_ZIP_PATH: /var/opentripplanner/subo-gtfs.zip
+
+      # spring-boot-docker-compose is developmentOnly (absent from the bootJar);
+      # this is belt-and-suspenders so the app never tries to drive Docker from
+      # inside a container.
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+
+    # Bound to 0.0.0.0 on purpose: the Expo app on a phone reaches this over
+    # the LAN, not via localhost.
     ports:
-      - "8081:8080"
+      - "${APP_PORT:-8080}:8080"
+
     volumes:
       - ./otp/data:/var/opentripplanner
+
+  otp:
+    <<: *otp-common
+    container_name: subo-otp
+    restart: unless-stopped
+    # 8082, not 8081: Expo's Metro bundler owns 8081, and the frontend dev
+    # server is expected to run alongside this stack. Only used for poking OTP
+    # directly — the app reaches it in-network at http://otp:8080.
+    ports:
+      - "${OTP_PORT:-8082}:8080"
+    # --load requires a pre-built graph.obj. On a clean checkout that file does
+    # not exist yet and this service WILL crash-loop until you run
+    # ./infrastructure/bootstrap.sh. See infrastructure/README.md.
     command:
       - "--load"
+
+  # --- Bootstrap-only services (profile: bootstrap) -------------------------
+  # Not started by `docker compose up`. Run once, in order, via bootstrap.sh.
+
+  # Pass 1: OSM PBF -> streetGraph.obj
+  otp-build-street:
+    <<: *otp-common
+    profiles: ["bootstrap"]
+    container_name: subo-otp-build-street
+    restart: "no"
+    command:
+      - "--buildStreet"
+
+  # Pass 2: streetGraph.obj + subo-gtfs.zip -> graph.obj
+  otp-build-transit:
+    <<: *otp-common
+    profiles: ["bootstrap"]
+    container_name: subo-otp-build-transit
+    restart: "no"
+    command:
+      - "--loadStreet"
+      - "--save"
 
 volumes:
   postgis_data:

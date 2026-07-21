@@ -1,0 +1,23 @@
+# Build output
+build/
+.gradle/
+out/
+bin/
+
+# VCS & IDE
+.git/
+.gitignore
+.gitattributes
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Infrastructure is mounted at runtime, never baked into the image.
+# Critically this keeps the OTP graph artifacts (.pbf/.obj/.zip, multi-GB)
+# out of the build context.
+infrastructure/
+
+HELP.md
+README.md
