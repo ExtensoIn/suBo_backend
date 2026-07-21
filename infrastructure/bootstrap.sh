@@ -89,9 +89,12 @@ fi
 step "Done — starting the full stack"
 dc up -d
 
+OTP_PORT="$(grep -E '^OTP_PORT=' .env 2>/dev/null | cut -d= -f2 || true)"
+OTP_PORT="${OTP_PORT:-8082}"
+
 printf '\nStack is up:\n'
 printf '  app   http://localhost:%s   (health: /actuator/health)\n' "$APP_PORT"
-printf '  otp   http://localhost:8081\n'
+printf '  otp   http://localhost:%s   (health: /otp)\n' "$OTP_PORT"
 LAN_IP="$(hostname -I | awk '{print $1}')"
 printf '\nFor the Expo app on a phone, point it at:\n'
 printf '  EXPO_PUBLIC_API_URL=http://%s:%s\n\n' "$LAN_IP" "$APP_PORT"
