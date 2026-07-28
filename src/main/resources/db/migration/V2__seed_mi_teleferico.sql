@@ -34,7 +34,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '0d844230-8bd2-51d4-bd1e-306d3231c6a5', 'TELEFERICO_ROJA', 'Roja',
     'Línea Roja', 'Mi Teleférico', 'teleferico',
-    '#E31B23', NULL, TRUE
+    '#E31B23', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -51,7 +51,7 @@ INSERT INTO transport_route (
 ) VALUES (
     'e5496b24-0eb3-505f-9169-25b2997f7425', 'TELEFERICO_AMARILLA', 'Amarilla',
     'Línea Amarilla', 'Mi Teleférico', 'teleferico',
-    '#F2D000', NULL, TRUE
+    '#F2D000', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -68,7 +68,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '20822904-a766-5b13-8344-70e7751de218', 'TELEFERICO_VERDE', 'Verde',
     'Línea Verde', 'Mi Teleférico', 'teleferico',
-    '#2DAA45', NULL, TRUE
+    '#2DAA45', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -85,7 +85,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '89787c34-f57c-50e4-b871-f7e004bb22b3', 'TELEFERICO_AZUL', 'Azul',
     'Línea Azul', 'Mi Teleférico', 'teleferico',
-    '#1554A3', NULL, TRUE
+    '#1554A3', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -102,7 +102,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '80eba35f-443a-5403-a506-9b14ba8035fb', 'TELEFERICO_NARANJA', 'Naranja',
     'Línea Naranja', 'Mi Teleférico', 'teleferico',
-    '#F58220', NULL, TRUE
+    '#F58220', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -119,7 +119,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '324bf7c6-0e69-51e4-8107-e41a637fa1c1', 'TELEFERICO_BLANCA', 'Blanca',
     'Línea Blanca', 'Mi Teleférico', 'teleferico',
-    '#FFFFFF', NULL, TRUE
+    '#FFFFFF', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -136,7 +136,7 @@ INSERT INTO transport_route (
 ) VALUES (
     'bf9a1da7-6bde-56e2-b634-a673e1df77f6', 'TELEFERICO_CELESTE', 'Celeste',
     'Línea Celeste', 'Mi Teleférico', 'teleferico',
-    '#00AEEF', NULL, TRUE
+    '#00AEEF', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -153,7 +153,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '72aa0420-f9fb-52e4-bb8f-f475bd0534b3', 'TELEFERICO_MORADA', 'Morada',
     'Línea Morada', 'Mi Teleférico', 'teleferico',
-    '#7A3DA5', NULL, TRUE
+    '#7A3DA5', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -170,7 +170,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '76194fa2-53ec-5be9-8c28-8392e78e7df3', 'TELEFERICO_CAFE', 'Café',
     'Línea Café', 'Mi Teleférico', 'teleferico',
-    '#795548', NULL, TRUE
+    '#795548', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -187,7 +187,7 @@ INSERT INTO transport_route (
 ) VALUES (
     '19b4f756-968f-5b81-ad27-addd5e041ddb', 'TELEFERICO_PLATEADA', 'Plateada',
     'Línea Plateada', 'Mi Teleférico', 'teleferico',
-    '#A7A9AC', NULL, TRUE
+    '#A7A9AC', 3, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
     code = EXCLUDED.code,
@@ -1354,8 +1354,8 @@ SELECT
     gen_random_uuid(),
     p.route_pattern_id,
     d.day_of_week,
-    TIME '01:00:00',
-    TIME '3:59:00',
+    TIME '06:30:00',
+    TIME '22:30:00',
     40,
     'frequency_based',
     TRUE
@@ -1399,8 +1399,8 @@ SELECT
     gen_random_uuid(),
     p.route_pattern_id,
     7,
-    TIME '01:00:00',
-    TIME '3:59:00',
+    TIME '07:00:00',
+    TIME '21:00:00',
     40,
     'frequency_based',
     TRUE

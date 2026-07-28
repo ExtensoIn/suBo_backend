@@ -1,7 +1,9 @@
 package com.tordoya.subo.trip.dto.response;
 
+import java.util.UUID;
+
 public record StartTripResponse(
-        String tripId,
+        UUID tripId,
         String shareToken,
         String shareUrl,
         String writeToken

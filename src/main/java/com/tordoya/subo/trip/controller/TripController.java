@@ -4,8 +4,7 @@ import com.tordoya.subo.trip.dto.request.StartTripRequest;
 import com.tordoya.subo.trip.dto.response.StartTripResponse;
 import com.tordoya.subo.trip.usecase.StartTripUseCase;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
