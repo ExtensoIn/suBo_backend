@@ -38,6 +38,8 @@ management:
 subo:
   otp:
     base-url: http://localhost:8081
+  trip:
+    share-base-url: http://localhost:8080/t
   gtfs:
     agency-id: SUBO
     agency-name: Subo

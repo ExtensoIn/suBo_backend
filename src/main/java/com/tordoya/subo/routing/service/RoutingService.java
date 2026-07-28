@@ -241,7 +241,7 @@ public class RoutingService {
             case CAMINAR -> "Camina de " + leg.from().name() + " a " + leg.to().name();
             case TELEFERICO -> "Toma el Teleférico de " + leg.from().name() + " a " + leg.to().name();
             case PUMAKATARI -> "Toma el PumaKatari de " + leg.from().name() + " a " + leg.to().name();
-            case MINIBUS -> "Toma el minibus de " + leg.from().name() + " a " + leg.to().name();
+            case MINIBUS -> "Toma el " + leg.route().longName() + " de " + leg.from().name() + " a " + leg.to().name();
             case TRUFI -> "Toma el trufi de " + leg.from().name() + " a " + leg.to().name();
         };
     }

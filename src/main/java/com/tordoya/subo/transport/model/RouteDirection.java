@@ -1,18 +1,18 @@
 package com.tordoya.subo.transport.model;
 
+import lombok.Getter;
+
+@Getter
 public enum RouteDirection {
     OUTBOUND("outbound"),
     INBOUND("inbound"),
-    CIRCULAR("circular");
+    CIRCULAR("circular"),
+    VARIANT("variant");
 
     private final String databaseValue;
 
     RouteDirection(String databaseValue) {
         this.databaseValue = databaseValue;
-    }
-
-    public String getDatabaseValue() {
-        return databaseValue;
     }
 
     public static RouteDirection fromDatabaseValue(String value) {

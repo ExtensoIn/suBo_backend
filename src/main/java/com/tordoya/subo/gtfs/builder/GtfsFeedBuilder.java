@@ -465,7 +465,7 @@ public class GtfsFeedBuilder {
         return switch (direction) {
             case OUTBOUND -> 0;
             case INBOUND -> 1;
-            case CIRCULAR -> null;
+            case CIRCULAR, VARIANT -> null;
         };
     }
 
