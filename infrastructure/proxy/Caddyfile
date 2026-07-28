@@ -1,0 +1,26 @@
+# Public edge for the subo API.
+#
+# Exists for one reason: the Spring app serves both the public routing API and
+# /internal/gtfs/export on the same port, and "/internal" is a naming
+# convention with no enforcement behind it. Publishing the app directly made
+# an unauthenticated, DB-reading, disk-writing export endpoint reachable from
+# the internet. This proxy is the enforcement.
+#
+# The app itself is no longer published publicly (see .env: APP_PORT is bound
+# to loopback); this is the only way in.
+
+:8090 {
+	# Deny before proxying. Covers /internal and everything beneath it.
+	@internal path /internal /internal/*
+	respond @internal 403
+
+	reverse_proxy app:8080 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}
